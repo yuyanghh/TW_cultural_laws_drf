@@ -1,5 +1,10 @@
 # venv settings
 crawler-drf-venv/
+.python-version
+
+# IDE settings
+.vscode
 
 # db
 db.sqlite3
+crawler_drf/__pycache__/
