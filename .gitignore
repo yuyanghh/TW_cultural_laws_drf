@@ -7,4 +7,7 @@ crawler-drf-venv/
 
 # db
 db.sqlite3
-crawler_drf/__pycache__/
+
+# cache
+__pycache__/
+*.py[cod]
