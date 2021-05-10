@@ -67,6 +67,7 @@ class ActView(GenericAPIView):
             keyword_freq = keyword_df.groupby(
                 'keyword')['count'].sum().sort_values(ascending=False)
             keyword_freq = pd.DataFrame(keyword_freq)
+            keyword_freq = keyword_freq.loc[keyword_freq['count'] > 1]
             return json.dumps(keyword_freq.to_records(index=True).tolist(), separators=(',', ':'))
 
         try:
@@ -95,9 +96,9 @@ class ActView(GenericAPIView):
                 act_announced_date = act_announced_date.find('td').string
                 result['announced_at'] = parse_chinese_date(act_announced_date)
 
-            act_valid_state = act_soup.select('#VaildState > td')[0]
+            act_valid_state = act_soup.select('#VaildState > td')
             if act_valid_state:
-                result['valid_state'] = act_valid_state.get_text()
+                result['valid_state'] = act_valid_state[0].get_text()
 
             act_type = act_soup.find('table').find_all(
                 'tr')[-1].find('td').string
@@ -112,7 +113,7 @@ class ActView(GenericAPIView):
                 elif check_self_with_classname(act_content, 'row'):
                     article_nr = act_content.select('.col-no > a')[0].string
                     act_rich_content = act_rich_content + article_nr + ' ' + act_content.select(
-                        '.col-data')[0].get_text()
+                        '.col-data')[0].get_text() + '<br>'
             keyword_list = segment_keyword(act_rich_content)
             keyword_freq = count_keyword_freq(keyword_list)
             result['rich_content'] = act_rich_content
