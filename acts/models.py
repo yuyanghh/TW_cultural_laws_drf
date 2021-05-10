@@ -25,7 +25,8 @@ class Act(TimeStampMixin):
 class Article(TimeStampMixin):
     id = models.AutoField(auto_created=True, primary_key=True)
     rich_content = models.TextField(blank=True, unique=True)  # 現行法條全文
-    act = models.ForeignKey('Act', on_delete=models.CASCADE)  # 所屬法案
+    act = models.ForeignKey('Act', related_name='articles',
+                            on_delete=models.CASCADE)  # 所屬法案
     chapter_nr = models.IntegerField(blank=True)  # 章節
     article_nr = models.IntegerField()  # 條目
     legislated_at = models.DateField(blank=True)  # 制定日期
@@ -40,7 +41,8 @@ class Article(TimeStampMixin):
 
 class Legislation(TimeStampMixin):
     id = models.AutoField(auto_created=True, primary_key=True)
-    article = models.ForeignKey('Article', on_delete=models.CASCADE)  # 所屬法條
+    article = models.ForeignKey(
+        'Article', related_name='legislations', on_delete=models.CASCADE)  # 所屬法條
     procedure_schedule = models.CharField(
         max_length=30)  # 議案進度(一讀、二讀、委員會審查、三讀...)
     sittings_date = models.DateField()  # 會議日期
