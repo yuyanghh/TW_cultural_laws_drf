@@ -11,7 +11,6 @@ class TimeStampMixin(models.Model):
 
 
 class Act(TimeStampMixin):
-    id = models.AutoField(auto_created=True, primary_key=True)
     name = models.CharField(max_length=500, unique=True)  # 法案名稱
     pcode = models.CharField(max_length=30, unique=True, blank=True)  # 法案Pcode
     valid_state = models.CharField(
@@ -26,7 +25,6 @@ class Act(TimeStampMixin):
 
 
 class Article(TimeStampMixin):
-    id = models.AutoField(auto_created=True, primary_key=True)
     rich_content = models.TextField(blank=True, unique=True)  # 現行法條全文
     act = models.ForeignKey('Act', related_name='articles',
                             on_delete=models.CASCADE)  # 所屬法案
@@ -43,7 +41,6 @@ class Article(TimeStampMixin):
 
 
 class Legislation(TimeStampMixin):
-    id = models.AutoField(auto_created=True, primary_key=True)
     article = models.ForeignKey(
         'Article', related_name='legislations', on_delete=models.CASCADE)  # 所屬法條
     procedure_schedule = models.CharField(
