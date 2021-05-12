@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.db import transaction
 from rest_framework.generics import GenericAPIView
 
-from acts.serializers import ActSerializer
-from acts.models import Act
+# from acts.serializers import ActSerializer
+# from acts.models import Act
 
 import datetime
 import json
@@ -22,14 +22,14 @@ exclude_dict = './jieba_dict/exclude_dict.txt'
 
 
 class ActView(GenericAPIView):
-    queryset = Act.objects.all()
-    serializer_class = ActSerializer
+    # queryset = Act.objects.all()
+    # serializer_class = ActSerializer
 
-    def get(self, request, *args, **krgs):
-        acts = self.get_queryset()
-        serializer = self.serializer_class(acts, many=True)
-        data = serializer.data
-        return JsonResponse(data, safe=False)
+    # def get(self, request, *args, **krgs):
+    #     acts = self.get_queryset()
+    #     serializer = self.serializer_class(acts, many=True)
+    #     data = serializer.data
+    #     return JsonResponse(data, safe=False)
 
     def post(self, request, *args, **krgs):
         data = request.data
@@ -119,11 +119,11 @@ class ActView(GenericAPIView):
             result['rich_content'] = act_rich_content
             result['keyword'] = keyword_freq
 
-            serializer = self.serializer_class(data=result)
-            serializer.is_valid(raise_exception=True)
-            with transaction.atomic():
-                serializer.save()
-            result = serializer.data
+            # serializer = self.serializer_class(data=result)
+            # serializer.is_valid(raise_exception=True)
+            # with transaction.atomic():
+            #     serializer.save()
+            # result = serializer.data
         except Exception as e:
             result = {'error': str(e)}
         return JsonResponse(result)
