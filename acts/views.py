@@ -68,7 +68,7 @@ class ActView(GenericAPIView):
                 'keyword')['count'].sum().sort_values(ascending=False)
             keyword_freq = pd.DataFrame(keyword_freq)
             keyword_freq = keyword_freq.loc[keyword_freq['count'] > 1]
-            return json.dumps(keyword_freq.to_records(index=True).tolist(), separators=(',', ':'))
+            return keyword_freq.to_records(index=True).tolist()
 
         try:
             result['name'] = act_name = data['name']  # db
