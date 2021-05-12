@@ -122,7 +122,7 @@ class ActView(GenericAPIView):
                     # act_rich_content = act_rich_content + article_nr + ' ' + act_content.select(
                     # '.col-data')[0].get_text() + '<br>'
                     act_rich_content += md(str(act_content.select(
-                        '.col-data')[0]), strip=['br'])
+                        '.col-data')[0]))
                     act_rich_content += '\n'
 
             act_content = act_soup.find(
