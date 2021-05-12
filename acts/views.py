@@ -7,7 +7,7 @@ from rest_framework.generics import GenericAPIView
 # from acts.models import Act
 
 import datetime
-import json
+from markdownify import markdownify as md
 import requests as rq
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -104,19 +104,30 @@ class ActView(GenericAPIView):
                 'tr')[-1].find('td').string
             result['act_type'] = ', '.join(act_type.split(' ＞ '))
 
-            act_content_list = act_soup.find(
-                'div', class_='law-reg-content').children
-            act_rich_content = ''
-            for act_content in act_content_list:
-                if check_self_with_classname(act_content, 'char-2'):
-                    act_rich_content = act_rich_content + act_content.string + '<br>'
-                elif check_self_with_classname(act_content, 'row'):
-                    article_nr = act_content.select('.col-no > a')[0].string
-                    act_rich_content = act_rich_content + article_nr + ' ' + act_content.select(
-                        '.col-data')[0].get_text() + '<br>'
-            keyword_list = segment_keyword(act_rich_content)
+            act_content = act_soup.find(
+                'div', class_='law-reg-content').get_text()
+            act_rich_content = str(act_soup.find(
+                'div', class_='law-reg-content'))
+
+            # act_rich_content = ''
+            # act_content_list = act_soup.find(
+            #     'div', class_='law-reg-content').children
+            # for act_content in act_content_list:
+            #     if check_self_with_classname(act_content, 'char-2'):
+            #         act_rich_content += md(str(act_content))
+            #     elif check_self_with_classname(act_content, 'row'):
+            #         # article_nr = act_content.select('.col-no > a')[0].string
+            #         act_rich_content += md(
+            #             str(act_content.select('.col-no > a')[0]))
+            #         # act_rich_content = act_rich_content + article_nr + ' ' + act_content.select(
+            #         # '.col-data')[0].get_text() + '<br>'
+            #         act_rich_content += md(str(act_content.select(
+            #             '.col-data')[0]))
+
+            keyword_list = segment_keyword(act_content)
             keyword_freq = count_keyword_freq(keyword_list)
-            result['rich_content'] = act_rich_content
+            result['rich_content'] = md(act_rich_content)
+            # result['rich_content'] = act_rich_content
             result['keyword'] = keyword_freq
 
             # serializer = self.serializer_class(data=result)
