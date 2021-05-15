@@ -72,8 +72,10 @@ class ActView(GenericAPIView):
 
         try:
             result['name'] = act_name = data['name']  # db
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0'}
             act_query_response = rq.get(
-                'https://law.moj.gov.tw/Law/LawSearchResult.aspx?ty=ONEBAR&kw='+act_name)
+                'https://law.moj.gov.tw/Law/LawSearchResult.aspx?ty=ONEBAR&kw='+act_name, headers=headers)
             act_query_html_doc = act_query_response.text
             act_query_soup = BeautifulSoup(act_query_html_doc, 'html.parser')
             act_ref_url = act_query_soup.find_all(
@@ -82,7 +84,7 @@ class ActView(GenericAPIView):
             result['pcode'] = act_pcode  # db
             act_url = 'https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=' + act_pcode
 
-            act_response = rq.get(act_url)
+            act_response = rq.get(act_url, headers=headers)
             act_html_doc = act_response.text
             act_soup = BeautifulSoup(act_html_doc, 'html.parser')
 
@@ -131,7 +133,8 @@ class ActView(GenericAPIView):
             keyword_freq = count_keyword_freq(keyword_list)
             # result['rich_content'] = md(act_rich_content)
             result['rich_content'] = act_rich_content
-            result['keyword'] = keyword_freq
+            result['keyword'] = keyword_list
+            result['keyword_freq'] = keyword_freq
 
             # serializer = self.serializer_class(data=result)
             # serializer.is_valid(raise_exception=True)
