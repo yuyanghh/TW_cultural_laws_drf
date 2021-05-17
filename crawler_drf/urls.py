@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path
 
 from acts import views as acts_view
+from executors import views as executors_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('acts/', acts_view.ActView.as_view())
+    path('acts/', acts_view.ActView.as_view()),
+    path('executors/', executors_view.ExecutorView.as_view())
 ]
