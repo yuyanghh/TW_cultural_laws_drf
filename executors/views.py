@@ -15,10 +15,13 @@ class ExecutorView(GenericAPIView):
 
         # crawler methods
         def parse_chinese_date(date_string):
-            chinese_year = int(date_string.split('年')[0])
-            chinese_month = int(date_string.split('年')[1].split('月')[0])
-            chinese_day = int(date_string.split('月')[1].split('日')[0])
-            return datetime.date(chinese_year+1911, chinese_month, chinese_day)
+            if date_string:
+                chinese_year = int(date_string.split('年')[0])
+                chinese_month = int(date_string.split('年')[1].split('月')[0])
+                chinese_day = int(date_string.split('月')[1].split('日')[0])
+                return datetime.date(chinese_year+1911, chinese_month, chinese_day)
+            else:
+                return ""
 
         def find_by_content(soup, tag, content):
             target = soup.find(tag, text=content)
