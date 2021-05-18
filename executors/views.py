@@ -74,10 +74,10 @@ class ExecutorView(GenericAPIView):
                 executor_soup, 'strong', '資本總額(元)')
             result['register_organization'] = find_by_content(
                 executor_soup, 'strong', '登記機關')
-            result['setup_date'] = find_by_content(
-                executor_soup, 'strong', '核准設立日期')
-            result['last_change_date'] = find_by_content(
-                executor_soup, 'strong', '最後核准變更日期')
+            result['setup_date'] = parse_chinese_date(
+                find_by_content(executor_soup, 'strong', '核准設立日期'))
+            result['last_change_date'] = parse_chinese_date(
+                find_by_content(executor_soup, 'strong', '最後核准變更日期'))
         try:
             executor_name = data['name']
             is_school = executor_name.find('大學') > 0 or executor_name.find(
