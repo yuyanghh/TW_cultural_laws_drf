@@ -56,9 +56,49 @@ class ActView(GenericAPIView):
             for keyword in keyword_list:
                 if keyword not in stop_words:
                     new_keyword_list.append(keyword)
-            return list(filter(lambda x: x != '' and x != ' ', new_keyword_list))
+            return list(filter(lambda x: x != '' and x != ' ' and x != '\n', new_keyword_list))
+
+        def segment_raw_keyword(text, cut_all=False):
+            keywords = jieba.lcut(text, cut_all=cut_all)
+            wiki_keywords = []
+            # headers = {
+            #     'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0'}
+
+            # i = 0
+            # while i < len(keywords) - 2:
+            #     with open('./jieba_dict/cultural_laws_dict.txt', 'r+') as fp:
+            #         cultural_laws_dict = fp.read()
+            #         next_1_keyword = (
+            #             keywords[i] + keywords[i+1]).strip(' \t\n\r')
+            #         next_2_keyword = (
+            #             keywords[i] + keywords[i+1] + keywords[i+2]).strip(' \t\n\r')
+            #         if next_1_keyword and len(next_1_keyword) > 2 and cultural_laws_dict.find(next_1_keyword) == -1:
+            #             try:
+            #                 response = rq.get(
+            #                     'https://zh.wikipedia.org/wiki/'+next_1_keyword, headers=headers)
+            #                 html_doc = response.text
+            #                 if html_doc.find('维基百科目前还没有与上述标题相同的Article') == -1:
+            #                     fp.seek(0, 2)
+            #                     fp.write('\n' + next_1_keyword)
+            #                     wiki_keywords.append(next_1_keyword)
+            #             except Exception as e:
+            #                 pass
+            #         elif next_2_keyword and len(next_2_keyword) > 2 and cultural_laws_dict.find(next_2_keyword) == -1:
+            #             try:
+            #                 response = rq.get(
+            #                     'https://zh.wikipedia.org/wiki/'+next_2_keyword, headers=headers)
+            #                 html_doc = response.text
+            #                 if html_doc.find('维基百科目前还没有与上述标题相同的Article') == -1:
+            #                     fp.seek(0, 2)
+            #                     fp.write('\n' + next_2_keyword)
+            #                     wiki_keywords.append(next_2_keyword)
+            #             except Exception as e:
+            #                 pass
+            #     i += 1
+            return (keywords, wiki_keywords)
 
         def segment_keyword(text, cut_all=False):
+            jieba.load_userdict('./jieba_dict/cultural_laws_dict.txt')
             return remove_stop_words(jieba.lcut(text, cut_all=cut_all))
 
         def count_keyword_freq(keyword_list):
@@ -102,14 +142,15 @@ class ActView(GenericAPIView):
             if act_valid_state:
                 result['valid_state'] = act_valid_state[0].get_text()
 
-            act_type = act_soup.find('table').find_all(
-                'tr')[-1].find('td').string
+            act_type = act_soup.find('th', text="法規類別：").parent.select('td')[
+                0].get_text()
             result['act_type'] = ', '.join(act_type.split(' ＞ '))
 
             # act_rich_content = str(act_soup.find(
             #     'div', class_='law-reg-content'))
 
             act_rich_content = ''
+
             act_content_list = act_soup.find(
                 'div', class_='law-reg-content').children
             for act_content in act_content_list:
@@ -127,13 +168,17 @@ class ActView(GenericAPIView):
                         '.col-data')[0]))
                     act_rich_content += '\n'
 
+            if act_rich_content.find('自公布日施行') > -1:
+                result['applied_at'] = result['amended_at'] or result['announced_at']
             act_content = act_soup.find(
                 'div', class_='law-reg-content').get_text()
+            (raw_keyword_list, wiki_keyword_list) = segment_raw_keyword(act_content)
             keyword_list = segment_keyword(act_content)
             keyword_freq = count_keyword_freq(keyword_list)
             # result['rich_content'] = md(act_rich_content)
             result['rich_content'] = act_rich_content
-            result['keyword'] = keyword_list
+            result['wiki_keyword'] = wiki_keyword_list
+            # result['keyword'] = keyword_list
             result['keyword_freq'] = keyword_freq
 
             # serializer = self.serializer_class(data=result)
