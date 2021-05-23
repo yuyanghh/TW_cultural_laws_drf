@@ -169,7 +169,8 @@ class ActView(GenericAPIView):
                     act_rich_content += '\n'
 
             if act_rich_content.find('自公布日施行') > -1:
-                result['applied_at'] = result['amended_at'] or result['announced_at']
+                result['applied_at'] = result.get(
+                    'amended_at') or result.get('announced_at')
             act_content = act_soup.find(
                 'div', class_='law-reg-content').get_text()
             (raw_keyword_list, wiki_keyword_list) = segment_raw_keyword(act_content)
