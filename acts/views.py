@@ -168,7 +168,7 @@ class ActView(GenericAPIView):
                         '.col-data')[0]))
                     act_rich_content += '\n'
 
-            if act_rich_content.find('自公布日施行') > -1:
+            if act_rich_content.find('自公布日施行') > -1 or act_rich_content.find('自發布日施行') > -1:
                 result['applied_at'] = result.get(
                     'amended_at') or result.get('announced_at')
             act_content = act_soup.find(
