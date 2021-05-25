@@ -18,9 +18,11 @@ from django.urls import path
 
 from acts import views as acts_view
 from executors import views as executors_view
+from art_purchase_orgs import views as art_purchase_orgs_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('acts/', acts_view.ActView.as_view()),
-    path('executors/', executors_view.ExecutorView.as_view())
+    path('executors/', executors_view.ExecutorView.as_view()),
+    path('art-purchase-orgs/', art_purchase_orgs_view.ArtPurchaseOrgView.as_view())
 ]

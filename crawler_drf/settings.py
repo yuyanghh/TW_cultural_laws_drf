@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'acts'
+    'acts',
+    'executors',
+    'art_purchase_orgs'
 ]
 
 MIDDLEWARE = [
