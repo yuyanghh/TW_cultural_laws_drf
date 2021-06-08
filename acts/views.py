@@ -120,9 +120,14 @@ class ActView(GenericAPIView):
                 i += 1
             return (keywords, wiki_keywords)
 
-        def segment_keyword(text, cut_all=False):
+        def segment_keyword(text, topK=100, cut_all=False):
             jieba.load_userdict('./jieba_dict/cultural_laws_dict.txt')
-            return jieba.analyse.extract_tags(text, topK=100, withWeight=True)
+            tags = jieba.analyse.extract_tags(
+                text, topK=int(topK), withWeight=True)
+            keywords_list = []
+            for tag in tags:
+                keywords_list.append(tag[0])
+            return keywords_list
             # return remove_stop_words(jieba.lcut(text, cut_all=cut_all))
 
         def count_keyword_freq(keyword_list):
@@ -134,7 +139,7 @@ class ActView(GenericAPIView):
             keyword_freq = keyword_freq.loc[keyword_freq['count'] > 1]
             return keyword_freq.to_records(index=True).tolist()
 
-        def get_act_data(result):
+        def get_act_data(data, result):
             try:
                 result['name'] = act_name = data['name']  # db
                 headers = {
@@ -202,8 +207,8 @@ class ActView(GenericAPIView):
                     'div', class_='law-reg-content').get_text()
                 # (raw_keyword_list, wiki_keyword_list) = segment_raw_keyword(act_content)
                 # result['wiki_keyword'] = wiki_keyword_list
-                keyword_list = segment_keyword(act_content)
-                result['keyword'] = keyword_list
+                keyword_list = segment_keyword(act_content, data['topK'])
+                result['keywords'] = keyword_list
                 # keyword_freq = count_keyword_freq(keyword_list)
                 # result['keyword_freq'] = keyword_freq
 
@@ -224,6 +229,6 @@ class ActView(GenericAPIView):
 
         # for i in range(125, 130):
         #     get_act_data(act_array[i], {})
-        get_act_data(result)
+        get_act_data(data, result)
         return JsonResponse(result)
         # return JsonResponse({'msg': 'ok'})
